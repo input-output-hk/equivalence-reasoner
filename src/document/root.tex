@@ -1,0 +1,48 @@
+\documentclass[a4paper,11pt]{article}
+
+\usepackage{typearea}
+
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
+\usepackage{textcomp}
+
+\usepackage{isabelle}
+\usepackage{isabellesym}
+
+\usepackage{latexsym}
+\usepackage{amssymb}
+
+\usepackage{pdfsetup}
+
+\urlstyle{rm}
+\isabellestyle{it}
+
+\newcommand{\authorinfo}[3]
+    {#1\medskip\\\small#2\smallskip\\\small\texttt{#3}}
+\newcommand{\andalso}
+    {\quad\enspace}
+
+\begin{document}
+
+\title{An Automated Equivalence Reasoner for Isabelle/HOL}
+\author{%
+    \authorinfo
+        {Wolfgang Jeltsch}
+        {Well-Typed\andalso IO Global}
+        {wolfgang@well-typed.com}%
+    \and
+    \authorinfo
+        {Javier Díaz}
+        {Atix Labs\andalso IO Global}
+        {javier.diaz@iohk.io}%
+}
+
+\maketitle
+
+\tableofcontents
+
+\parindent 0pt\parskip 0.5ex
+
+\input{session}
+
+\end{document}

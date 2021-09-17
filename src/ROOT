@@ -1,0 +1,7 @@
+chapter IOG
+
+session Equivalence_Reasoner = HOL +
+  description
+    \<open>An Automated Equivalence Reasoner for Isabelle/HOL.\<close>
+  document_files
+    "root.tex"

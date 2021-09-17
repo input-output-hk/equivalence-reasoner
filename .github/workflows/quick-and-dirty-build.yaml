@@ -1,0 +1,35 @@
+name: Automated quick-and-dirty build
+
+env:
+  isabelle-version: 2021
+  chapter-name: IOG
+  session-name: Equivalence_Reasoner
+  source-path: src
+
+on: [push]
+
+jobs:
+  quick-and-dirty-build:
+    runs-on: ubuntu-latest
+    container: texlive/texlive:latest
+    steps:
+      - name: Get Isabelle from cache if available
+        uses: actions/cache@v2
+        with:
+          key: isabelle-${{ env.isabelle-version }}-linux
+          path: /opt/Isabelle${{ env.isabelle-version }}
+      - name: Get Isabelle from upstream if not found in cache
+        run: |
+          if [ ! -e /opt/Isabelle${{ env.isabelle-version }} ]; then
+            wget --no-verbose --output-document=- https://mirror.clarkson.edu/isabelle/dist/Isabelle${{ env.isabelle-version }}_linux.tar.gz |
+            tar --directory=/opt --extract --gzip
+          fi
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Build
+        run: /opt/Isabelle${{ env.isabelle-version }}/bin/isabelle build -o quick_and_dirty -o document=pdf -P output -D ${{ env.source-path }}
+      - name: Upload document
+        uses: actions/upload-artifact@v2
+        with:
+          name: document
+          path: output/${{ env.chapter-name }}/${{ env.session-name }}/document.pdf
