@@ -3,5 +3,7 @@ chapter IOG
 session Equivalence_Reasoner = HOL +
   description
     \<open>An Automated Equivalence Reasoner for Isabelle/HOL.\<close>
+  theories
+    Equivalence_Reasoner
   document_files
     "root.tex"
