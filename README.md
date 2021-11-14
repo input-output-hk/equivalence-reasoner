@@ -9,11 +9,11 @@ rewrite rules. The `equivalence-reasoner` library makes this possible.
 
 Of course, rewriting based on equivalences is generally not sound.
 However, there are situations where it is indeed valid. For example, if
-the goal is of the form `R x y` where `R` is known to be an equivalence
-relation, it is okay to use a fact of the form `R x x'` as a rewrite
-rule to turn that goal into `R x' y`. A more complex example would be
-that of a goal `R (f x) y` where `R` is a congruence with respect
-to `f`. This goal can be safely turned into `R (f x') y`.
+the goal is `R x y` where `R` is known to be an equivalence relation, it
+is okay to use a fact `R x x'` as a rewrite rule to turn that goal into
+`R x' y`. A more complex example would be that of a goal `R (f x) y`
+where `R` is a congruence with respect to `f`. This goal can be safely
+turned into `R (f x') y`.
 
 The facilities of the `equivalence-reasoner` library go even beyond
 these kinds of rewriting, making it a versatile tool for automated
