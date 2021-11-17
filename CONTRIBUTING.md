@@ -33,8 +33,7 @@ When committing to this repository, please follow these rules:
     put the subject line of the pull request into the body of the commit
     message and use a subject line of the following form:
 
-        Merge `⟨branch⟩` of pull request #⟨pull-request-number⟩ into
-        `master`
+        Merge `⟨branch⟩` of pull request #⟨pull-request-number⟩ into `master`
 
     Here, `⟨branch⟩` refers to the name of the branch without the GitHub
     account name component.
