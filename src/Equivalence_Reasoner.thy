@@ -45,9 +45,9 @@ method generate_relax_inclusions for R :: "'a \<Rightarrow> 'a \<Rightarrow> boo
 method relax uses inclusions processed = (
   match premises in first [thin]: _ (cut) \<Rightarrow> \<open>
     match inclusions in inclusion: "S \<le> _" for S :: "'a \<Rightarrow> 'a \<Rightarrow> bool" \<Rightarrow> \<open>
-      match first in
+      match first [uncurry] in
         "S _ _" (cut) \<Rightarrow> \<open>succeed\<close> \<bar>
-        _ [uncurry]: "_ \<Longrightarrow> S _ _" (cut) \<Rightarrow> \<open>succeed\<close>,
+        "_ \<Longrightarrow> S _ _" (cut) \<Rightarrow> \<open>succeed\<close>,
       relax
         inclusions: inclusions
         processed: processed first [THEN inclusion [THEN predicate2D]]
