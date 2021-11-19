@@ -29,34 +29,34 @@ definition representative :: "'a set \<Rightarrow> 'a" where
 abbreviation canonical :: "('a \<Rightarrow> 'a \<Rightarrow> bool) \<Rightarrow> 'a \<Rightarrow> 'a" where
   "canonical R x \<equiv> representative [x]\<^bsub>R\<^esub>"
 
-method generate_relax_inclusions for R :: "'a \<Rightarrow> 'a \<Rightarrow> bool" uses processed = (
-  match premises in first [thin]: "S \<le> R" (cut) for S \<Rightarrow> \<open>
+method generate_relax_inclusions for R :: "'a \<Rightarrow> 'a \<Rightarrow> bool" uses accumulator = (
+  match premises in base [thin]: "S \<le> R" (cut) for S \<Rightarrow> \<open>
     (
-      match premises in second [thin]: "_ \<le> S" (multi, cut) \<Rightarrow> \<open>
-        insert second [THEN order_trans, OF first]
+      match premises in extensions [thin]: "_ \<le> S" (multi, cut) \<Rightarrow> \<open>
+        insert extensions [THEN order_trans, OF base]
       \<close>
     )?,
-    generate_relax_inclusions R processed: processed first
+    generate_relax_inclusions R accumulator: accumulator base
   \<close> |
-  (match premises in unused [thin]: _ (multi, cut) \<Rightarrow> \<open>succeed\<close>)?,
-  insert processed order_refl [of R]
+  (match premises in leftover [thin]: _ (multi, cut) \<Rightarrow> \<open>succeed\<close>)?,
+  insert accumulator order_refl [of R]
 )
 
-method relax uses inclusions processed = (
-  match premises in first [thin]: _ (cut) \<Rightarrow> \<open>
+method relax uses inclusions accumulator = (
+  match premises in premise [thin]: _ (cut) \<Rightarrow> \<open>
     match inclusions in inclusion: "S \<le> _" for S :: "'a \<Rightarrow> 'a \<Rightarrow> bool" \<Rightarrow> \<open>
-      match first [uncurry] in
+      match premise [uncurry] in
         "S _ _" (cut) \<Rightarrow> \<open>succeed\<close> \<bar>
         "_ \<Longrightarrow> S _ _" (cut) \<Rightarrow> \<open>succeed\<close>,
       relax
         inclusions: inclusions
-        processed: processed first [THEN inclusion [THEN predicate2D]]
+        accumulator: accumulator premise [THEN inclusion [THEN predicate2D]]
     \<close> |
     relax
       inclusions: inclusions
-      processed: processed
+      accumulator: accumulator
   \<close> |
-  insert processed
+  insert accumulator
 )
 
 method raw_equivalence uses equivalence inclusion compatibility simplification = (
