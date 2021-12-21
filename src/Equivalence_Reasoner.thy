@@ -223,8 +223,8 @@ method generate_relax_inclusions for R :: "'a \<Rightarrow> 'a \<Rightarrow> boo
 
 text \<open>
   We introduce a helper method \<^theory_text>\<open>relax\<close> that takes a set of inclusions and turns all goal premises
-  of the shape \<open>P\<^sub>1 \<Longrightarrow> \<cdots> \<Longrightarrow> P\<^sub>n \<Longrightarrow> S x y\<close> for which \<^term>\<open>S \<le> R\<close> is among the given conclusions
-  into \<open>P\<^sub>1 \<Longrightarrow> \<cdots> \<Longrightarrow> P\<^sub>n \<Longrightarrow> R x y\<close>, while dropping all other premises.
+  of the shape \<open>P\<^sub>1 \<Longrightarrow> \<cdots> \<Longrightarrow> P\<^sub>n \<Longrightarrow> S x y\<close> for which \<^term>\<open>S \<le> R\<close> is among the given inclusions into
+  \<open>P\<^sub>1 \<Longrightarrow> \<cdots> \<Longrightarrow> P\<^sub>n \<Longrightarrow> R x y\<close>, while dropping all other premises.
 
   The \<^theory_text>\<open>relax\<close> method recursively invokes itself. It removes the input premises one by one from the
   goal and collects the output premises in a fact argument \<^theory_text>\<open>accumulator\<close>. As with
