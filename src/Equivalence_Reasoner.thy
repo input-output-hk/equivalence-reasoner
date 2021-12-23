@@ -242,9 +242,11 @@ method relax uses inclusions accumulator = (
         "S _ _" (cut) \<Rightarrow> \<open>succeed\<close> \<bar>
         "_ \<Longrightarrow> S _ _" (cut) \<Rightarrow> \<open>succeed\<close>,
       \<comment> \<open>Continue with the relaxed premise added to the set of output premises:\<close>
-      relax
-        inclusions: inclusions
-        accumulator: accumulator premise [THEN inclusion [THEN predicate2D]]
+      match ("()") in "()" \<Rightarrow> \<open>
+        relax
+          inclusions: inclusions
+          accumulator: accumulator premise [THEN inclusion [THEN predicate2D]]
+      \<close>
     \<close> |
     \<comment> \<open>Continue with the set of output premises unchanged:\<close>
     relax
