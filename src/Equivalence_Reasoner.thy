@@ -235,6 +235,8 @@ text \<open>
 method relax uses inclusions accumulator = (
   \<comment> \<open>Pick a premise and process it:\<close>
   match premises in premise [thin]: _ (cut) \<Rightarrow> \<open>
+    \<comment> \<open>Move all remaining premises back into the goal (see #24 for the reason of that):\<close>
+    (match premises in remaining [thin]: _ (multi, cut) \<Rightarrow> \<open>insert remaining\<close>)?,
     \<comment> \<open>Get the inclusion that fits the premise and process the premise using it:\<close>
     match inclusions in inclusion: "S \<le> _" for S :: "'a \<Rightarrow> 'a \<Rightarrow> bool" \<Rightarrow> \<open>
       \<comment> \<open>Make sure the inclusion fits the premise (if it does not, backtrack):\<close>
