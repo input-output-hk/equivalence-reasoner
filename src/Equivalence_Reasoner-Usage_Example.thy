@@ -302,4 +302,52 @@ proof -
       )
 qed
 
+subsection \<open>Asymptotic Bounds\<close>
+
+definition asymptotically_bounded_above_by :: "sequence \<Rightarrow> sequence \<Rightarrow> bool" (infix \<open>\<preceq>\<close> 50) where
+  "X \<preceq> Y \<longleftrightarrow> limit_superior (X / Y) \<le> 1"
+
+lemma asymptotically_bounded_above_by_reflexivity [iff]:
+  shows "X \<preceq> X"
+proof -
+  have "limit_superior (X / X) \<le> 1" for X :: sequence
+  proof -
+    have "limit_superior (X / X) = limit_superior 1"
+      by (transfer, transfer) (simp add: less_le)
+    also have "\<dots> = 1"
+      by (transfer, transfer) (simp add: Limsup_const)
+    also have "\<dots> \<le> 1"
+      using order.refl .
+    finally show ?thesis .
+  qed
+  then show ?thesis
+    unfolding asymptotically_bounded_above_by_def .
+qed
+
+lemma asymptotically_bounded_above_by_transitivity [trans]:
+  assumes "X \<preceq> Y" and "Y \<preceq> Z"
+  shows "X \<preceq> Z"
+proof -
+  have raw_thesis:
+    "limit_superior (X / Z) \<le> 1"
+    if "limit_superior (X / Y) \<le> 1" and "limit_superior (Y / Z) \<le> 1"
+    for X Y Z :: sequence
+  proof -
+    have "limit_superior (X / Z) = limit_superior ((X / Y) * (Y / Z))"
+      by (transfer, transfer) (simp add: less_le)
+    also have "\<dots> \<le> limit_superior (X / Y) * limit_superior (Y / Z)"
+      by (
+        rule limit_superior_of_product, unfold infinity_ennreal_def;
+        rule neq_top_trans, use that in simp_all
+      )
+    also have "\<dots> \<le> 1"
+      using mult_mono and that
+      by fastforce
+    finally show ?thesis .
+  qed
+  from assms show ?thesis
+    unfolding asymptotically_bounded_above_by_def
+    by (fact raw_thesis)
+qed
+
 end
