@@ -96,4 +96,94 @@ lemma extended_ln_continuity:
     (rule continuous_onI_mono)
     (simp add: extended_ln_surjectivity, rule extended_ln_monotonicity [THEN monoD])
 
+subsection \<open>Positive Reals\<close>
+
+typedef positive_real = "{x :: real. x > 0}"
+  using zero_less_one
+  by blast
+
+setup_lifting type_definition_positive_real
+
+instantiation positive_real :: comm_semiring
+begin
+
+lift_definition plus_positive_real :: "positive_real \<Rightarrow> positive_real \<Rightarrow> positive_real"
+  is "(+)"
+  using add_pos_pos .
+
+lift_definition times_positive_real :: "positive_real \<Rightarrow> positive_real \<Rightarrow> positive_real"
+  is "(*)"
+  using mult_pos_pos .
+
+instance by (standard; transfer) (simp_all add: algebra_simps)
+
+end
+
+instantiation positive_real :: comm_monoid_mult
+begin
+
+lift_definition one_positive_real :: positive_real
+  is 1
+  using zero_less_one .
+
+instance by (standard; transfer) simp
+
+end
+
+instantiation positive_real :: inverse
+begin
+
+lift_definition divide_positive_real :: "positive_real \<Rightarrow> positive_real \<Rightarrow> positive_real"
+  is "(/)"
+  using divide_pos_pos .
+
+lift_definition inverse_positive_real :: "positive_real \<Rightarrow> positive_real"
+  is inverse
+  using positive_imp_inverse_positive .
+
+instance ..
+
+end
+
+instantiation positive_real :: unbounded_dense_linorder
+begin
+
+lift_definition less_eq_positive_real :: "positive_real \<Rightarrow> positive_real \<Rightarrow> bool"
+  is "(\<le>)" .
+
+lift_definition less_positive_real :: "positive_real \<Rightarrow> positive_real \<Rightarrow> bool"
+  is "(<)" .
+
+instance proof ((standard; transfer), unfold bex_simps(6))
+  show "\<exists>z > 0. x < z \<and> z < y" if "x > 0" and "x < y" for x y :: real
+  proof
+    show "(x + y) / 2 > 0 \<and> x < (x + y) / 2 \<and> (x + y) / 2 < y"
+      using that
+      by simp
+  qed
+next
+  show "\<exists>y > 0. y > x" if "x > 0" for x :: real
+    using gt_ex and that
+    by (iprover intro: less_trans)
+next
+  show "\<exists>y > 0. y < x" if "x > 0" for x :: real
+    using dense [OF that] .
+qed auto
+
+end
+
+lift_definition extended_non_negative_real :: "positive_real \<Rightarrow> ennreal"
+  is ennreal .
+
+lemma extended_non_negative_real_is_finite:
+  shows "extended_non_negative_real x \<noteq> \<infinity>"
+  by transfer simp
+
+lemma extended_non_negative_real_of_product:
+  shows "
+    extended_non_negative_real (x * y)
+    =
+    extended_non_negative_real x * extended_non_negative_real y"
+  by transfer (simp only: ennreal_mult)
+
 end
