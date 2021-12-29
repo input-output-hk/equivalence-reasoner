@@ -5,7 +5,7 @@ section \<open>Usage Example\<close>
 theory "Equivalence_Reasoner-Usage_Example"
 imports
   Equivalence_Reasoner
-  "HOL-Library.Extended_Nonnegative_Real"
+  "HOL-Analysis.Extended_Real_Limits"
 begin
 
 subsection \<open>Extended Reals\<close>
@@ -185,5 +185,121 @@ lemma extended_non_negative_real_of_product:
     =
     extended_non_negative_real x * extended_non_negative_real y"
   by transfer (simp only: ennreal_mult)
+
+subsection \<open>Sequences of Positive Reals\<close>
+
+typedef sequence = "UNIV :: (nat \<Rightarrow> positive_real) set"
+  by simp
+
+setup_lifting type_definition_sequence
+
+instantiation sequence :: comm_semiring
+begin
+
+lift_definition plus_sequence :: "sequence \<Rightarrow> sequence \<Rightarrow> sequence"
+  is "\<lambda>X Y. \<lambda>i. X i + Y i" .
+
+lift_definition times_sequence :: "sequence \<Rightarrow> sequence \<Rightarrow> sequence"
+  is "\<lambda>X Y. \<lambda>i. X i * Y i" .
+
+instance by (standard; transfer) (simp_all add: algebra_simps)
+
+end
+
+instantiation sequence :: comm_monoid_mult
+begin
+
+lift_definition one_sequence :: sequence
+  is "\<lambda>_. 1" .
+
+instance by (standard; transfer) simp
+
+end
+
+instantiation sequence :: inverse
+begin
+
+lift_definition divide_sequence :: "sequence \<Rightarrow> sequence \<Rightarrow> sequence"
+  is "\<lambda>X Y. \<lambda>i. X i / Y i" .
+
+lift_definition inverse_sequence :: "sequence \<Rightarrow> sequence"
+  is "\<lambda>X. \<lambda>i. inverse (X i)" .
+
+instance ..
+
+end
+
+instantiation sequence :: dense_order
+begin
+
+lift_definition less_eq_sequence :: "sequence \<Rightarrow> sequence \<Rightarrow> bool"
+  is "(\<le>)" .
+
+lift_definition less_sequence :: "sequence \<Rightarrow> sequence \<Rightarrow> bool"
+  is "(<)" .
+
+instance proof (standard; transfer)
+  show "\<exists>Z > X. Z < Y" if "X < Y" for X Y Z :: "nat \<Rightarrow> positive_real"
+  proof -
+    from \<open>X < Y\<close> obtain i where "X i < Y i"
+      by (metis leD le_funI leI)
+    then obtain z where "X i < z" and "z < Y i"
+      using dense
+      by blast
+    with \<open>X < Y\<close> have "X < X(i := z)" and "X(i := z) < Y"
+      by (auto simp add: less_le_not_le le_fun_def)
+    then show ?thesis
+      by iprover
+  qed
+qed (simp_all add: less_le_not_le)
+
+end
+
+lift_definition limit_superior :: "sequence \<Rightarrow> ennreal"
+  is "\<lambda>X. limsup (\<lambda>i. extended_non_negative_real (X i))" .
+
+lemma limit_superior_of_product:
+  assumes "limit_superior X \<noteq> \<infinity>" and "limit_superior Y \<noteq> \<infinity>"
+  shows "limit_superior (X * Y) \<le> limit_superior X * limit_superior Y"
+proof -
+  note Limsup_after_extended_ln =
+    Limsup_compose_continuous_mono [OF extended_ln_continuity extended_ln_monotonicity]
+  have raw_thesis:
+    "limsup (\<lambda>i. X i * Y i) \<le> limsup X * limsup Y"
+    if "\<And>i. X i \<noteq> \<infinity>" and "\<And>i. Y i \<noteq> \<infinity>" and "limsup X \<noteq> \<infinity>" and "limsup Y \<noteq> \<infinity>"
+    for X Y :: "nat \<Rightarrow> ennreal"
+  proof -
+    from that(3-4) have "extended_ln (limsup X) \<noteq> \<infinity>" and "extended_ln (limsup Y) \<noteq> \<infinity>"
+      by (metis extended_exp_after_extended_ln extended_exp.simps(3))+
+    then have 1: "limsup (\<lambda>i. extended_ln (X i)) \<noteq> \<infinity>" and 2: "limsup (\<lambda>i. extended_ln (Y i)) \<noteq> \<infinity>"
+      by (simp_all add: Limsup_after_extended_ln)
+    have "limsup (\<lambda>i. X i * Y i) = extended_exp (extended_ln (limsup (\<lambda>i. X i * Y i)))"
+      by (simp only: extended_exp_after_extended_ln)
+    also have "\<dots> = extended_exp (limsup (\<lambda>i. extended_ln (X i * Y i)))"
+      by (simp_all add: Limsup_after_extended_ln)
+    also have "\<dots> = extended_exp (limsup (\<lambda>i. extended_ln (X i) + extended_ln (Y i)))"
+      using extended_ln_of_product and that(1-2)
+      by simp
+    also have "\<dots> \<le> extended_exp (limsup (\<lambda>i. extended_ln (X i)) + limsup (\<lambda>i. extended_ln (Y i)))"
+      using ereal_limsup_add_mono
+      by (rule extended_exp_monotonicity [THEN monoD])
+    also have "\<dots> =
+      extended_exp (limsup (\<lambda>i. extended_ln (X i))) * extended_exp (limsup (\<lambda>i. extended_ln (Y i)))"
+      using extended_exp_of_sum and 1 2
+      by simp
+    also have "\<dots> = extended_exp (extended_ln (limsup X)) * extended_exp (extended_ln (limsup Y))"
+      by (simp_all add: Limsup_after_extended_ln)
+    also have "\<dots> = limsup X * limsup Y"
+      by (simp only: extended_exp_after_extended_ln)
+    finally show ?thesis .
+  qed
+  from assms show ?thesis
+    by
+      transfer
+      (auto
+        simp only: extended_non_negative_real_of_product extended_non_negative_real_is_finite
+        intro: raw_thesis
+      )
+qed
 
 end

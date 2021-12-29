@@ -5,6 +5,7 @@ session Equivalence_Reasoner = HOL +
     \<open>An Automated Equivalence Reasoner for Isabelle/HOL.\<close>
   sessions
     "HOL-Eisbach"
+    "HOL-Analysis"
   theories
     Equivalence_Reasoner
     "Equivalence_Reasoner-Usage_Example"
