@@ -7,5 +7,6 @@ session Equivalence_Reasoner = HOL +
     "HOL-Eisbach"
   theories
     Equivalence_Reasoner
+    "Equivalence_Reasoner-Usage_Example"
   document_files
     "root.tex"
