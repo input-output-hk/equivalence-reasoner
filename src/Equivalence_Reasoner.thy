@@ -33,7 +33,7 @@ text \<open>
   unsuccessful expose these transformations. As a result, such an intermediate goal is typically
   harder to comprehend than the original goal, and a follow-up invocation of the equivalence
   reasoner will almost certainly fail, even when using a different configuration. For details about
-  the transformations the equivalence reasoner performs see~\ref{implementation}.
+  the transformations the equivalence reasoner performs see Section~\ref{implementation}.
 
   Both equivalence reasoner methods share the same interface, which has the following appearance:
 
@@ -85,7 +85,7 @@ text \<open>
       described above, but only requires them to be equivalences. As a result, compatibility rules
       can be used to trigger behavior more complex than just the application of actual
       compatibilities. To see exactly how the equivalence handler uses compatibility rules, turn
-      to~ref{implementation}.
+      to Section~\ref{implementation}.
 
       Like with \<^theory_text>\<open>equivalence\<close> and \<^theory_text>\<open>inclusion\<close>, \<^theory_text>\<open>compatibility\<close> can be augmented via method
       arguments. All facts that are not of the form \<open>R _ _\<close> where \<^term>\<open>R\<close> is the equivalence
