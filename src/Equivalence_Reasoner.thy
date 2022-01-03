@@ -260,18 +260,16 @@ method relax uses inclusions accumulator = (
 )
 
 text \<open>
-  We introduce a helper method \<^theory_text>\<open>raw_equivalence\<close> that essentially works like \<^theory_text>\<open>try_equivalence\<close>.
-  The only difference is that \<^theory_text>\<open>raw_equivalence\<close> does not use the named theorems \<^theory_text>\<open>equivalence\<close>,
-  \<^theory_text>\<open>inclusion\<close>, and \<^theory_text>\<open>compatibility\<close>, but receives the respective fact lists as fact arguments. This
-  enables us to use \<^theory_text>\<open>raw_equivalence\<close> in the implementation of the \<^theory_text>\<open>equivalence\<close> method. If
-  \<^theory_text>\<open>equivalence\<close> would invoke \<^theory_text>\<open>try_equivalence\<close> instead of \<^theory_text>\<open>raw_equivalence\<close>, the facts that come
-  from the unaugmented named theorems \<^theory_text>\<open>equivalence\<close>, \<^theory_text>\<open>inclusion\<close>, and \<^theory_text>\<open>compatibility\<close> would be
-  duplicated: \<^theory_text>\<open>equivalence\<close> would augment all named theorems with the corresponding declaration
-  arguments and could only use the resulting fact lists in its invocation of \<^theory_text>\<open>try_equivalence\<close>,
-  which would augment the named theorems with these fact lists.
+  We declare the named theorems \<^theory_text>\<open>equivalence\<close>, \<^theory_text>\<open>inclusion\<close>, and \<^theory_text>\<open>compatibility\<close>.
 \<close>
 
-method raw_equivalence uses equivalence inclusion compatibility simplification = (
+named_theorems equivalence and inclusion and compatibility
+
+text \<open>
+  We implement the \<^theory_text>\<open>try_equivalence\<close> method.
+\<close>
+
+method try_equivalence uses simplification declares equivalence inclusion compatibility = (
   \<comment> \<open>Turn all chained facts into goal premises and try to solve the resulting goal:\<close>
   -, use nothing in \<open>
     \<comment> \<open>Get the equivalence relation that is used by the conclusion and perform relaxation using it:\<close>
@@ -305,32 +303,24 @@ method raw_equivalence uses equivalence inclusion compatibility simplification =
 )
 
 text \<open>
-  We declare the named theorems \<^theory_text>\<open>equivalence\<close>, \<^theory_text>\<open>inclusion\<close>, and \<^theory_text>\<open>compatibility\<close>.
+  Finally, we implement the \<^theory_text>\<open>equivalence\<close> method.
+
+  We introduce the arguments \<^theory_text>\<open>equivalence\<close>, \<^theory_text>\<open>inclusion\<close>, and \<^theory_text>\<open>compatibility\<close> as fact arguments
+  instead of declaration arguments. This is because \<^theory_text>\<open>equivalence\<close> invokes
+  @{method try_equivalence}, which expects to receive only additions to the named theorems and
+  augments the named theorems with those. If \<^theory_text>\<open>equivalence\<close> would already augment the named
+  theorems, the fact lists that @{method try_equivalence} ultimately uses would contain the facts
+  from the unaugmented named theorems twice.
 \<close>
 
-named_theorems equivalence and inclusion and compatibility
-
-text \<open>
-  Finally, we implement the methods we offer to the user.
-\<close>
-
-method try_equivalence uses simplification declares equivalence inclusion compatibility = (
-  \<comment> \<open>Invoke @{method raw_equivalence} with the augmented named theorems and the simplification rules:\<close>
-  raw_equivalence
-    equivalence: equivalence
-    inclusion: inclusion
-    compatibility: compatibility
-    simplification: simplification
-)
-
-method equivalence uses simplification declares equivalence inclusion compatibility = (
-  \<comment> \<open>Invoke @{method raw_equivalence} with the augmented named theorems and the simplification rules:\<close>
-  raw_equivalence
+method equivalence uses equivalence inclusion compatibility simplification = (
+  \<comment> \<open>Invoke @{method try_equivalence}:\<close>
+  try_equivalence
     equivalence: equivalence
     inclusion: inclusion
     compatibility: compatibility
     simplification: simplification;
-  \<comment> \<open>Fail (only done if @{method raw_equivalence} left a goal, because of the \<^theory_text>\<open>;\<close>-combinator):\<close>
+  \<comment> \<open>Fail (only done if @{method try_equivalence} has left a goal, because of the \<^theory_text>\<open>;\<close>-combinator):\<close>
   fail
 )
 
