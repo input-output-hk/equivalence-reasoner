@@ -16,7 +16,7 @@ text \<open>
       can be replaced if \<^term>\<open>f\<close>~and~\<^term>\<open>g\<close> are compatible with~\<^term>\<open>R\<close>, and the first, if just
       \<^term>\<open>f\<close> is.
 
-    \<^item> Rewrite rules can be conditional, that is, have the shape \<open>P\<^sub>1 \<Longrightarrow> \<cdots> \<Longrightarrow> P\<^sub>n \<Longrightarrow> S t t'\<close>. The
+    \<^item> Rewrite rules can be conditional, that is, have the shape \<open>P\<^sub>1 \<Longrightarrow> \<cdots> \<Longrightarrow> P\<^sub>n \<Longrightarrow> S t\<^sub>1 t\<^sub>2\<close>. The
       additional conditions \<^term>\<open>P\<^sub>1\<close> to~\<^term>\<open>P\<^sub>n\<close> must be solvable by the Simplifier.
 
   The equivalence reasoner offers its services via two proof methods:
@@ -128,8 +128,8 @@ text \<open>
 
     \<^item> First, each equivalence \<^term>\<open>R t\<^sub>1 t\<^sub>2\<close> is turned into \<^term>\<open>[t\<^sub>1]\<^bsub>R\<^esub> = [t\<^sub>2]\<^bsub>R\<^esub>\<close>.
 
-    \<^item> Second, each equivalence class construction \<^term>\<open>[t]\<^bsub>R\<^esub>\<close> for which there is a compatibility
-      rule \<^term>\<open>R t t'\<close> is turned into \<^term>\<open>[t']\<^bsub>R\<^esub>\<close>. This is done repeatedly until no such
+    \<^item> Second, each equivalence class construction \<^term>\<open>[t\<^sub>1]\<^bsub>R\<^esub>\<close> for which there is a compatibility
+      rule \<^term>\<open>R t\<^sub>1 t\<^sub>2\<close> is turned into \<^term>\<open>[t\<^sub>2]\<^bsub>R\<^esub>\<close>. This is done repeatedly until no such
       replacement is possible anymore.
 
   Both of these steps involve converting equivalences into equalities of equivalence classes: the
@@ -223,8 +223,8 @@ method generate_relax_inclusions for R :: "'a \<Rightarrow> 'a \<Rightarrow> boo
 
 text \<open>
   We introduce a helper method \<^theory_text>\<open>relax\<close> that takes a set of inclusions and turns all goal premises
-  of the shape \<open>P\<^sub>1 \<Longrightarrow> \<cdots> \<Longrightarrow> P\<^sub>n \<Longrightarrow> S t t'\<close> for which \<^term>\<open>S \<le> R\<close> is among the given inclusions
-  into \<open>P\<^sub>1 \<Longrightarrow> \<cdots> \<Longrightarrow> P\<^sub>n \<Longrightarrow> R t t'\<close>, while dropping all other premises.
+  of the shape \<open>P\<^sub>1 \<Longrightarrow> \<cdots> \<Longrightarrow> P\<^sub>n \<Longrightarrow> S t\<^sub>1 t\<^sub>2\<close> for which \<^term>\<open>S \<le> R\<close> is among the given inclusions
+  into \<open>P\<^sub>1 \<Longrightarrow> \<cdots> \<Longrightarrow> P\<^sub>n \<Longrightarrow> R t\<^sub>1 t\<^sub>2\<close>, while dropping all other premises.
 
   The \<^theory_text>\<open>relax\<close> method recursively invokes itself. It removes the input premises one by one from the
   goal and collects the output premises in a fact argument \<^theory_text>\<open>accumulator\<close>. As with
