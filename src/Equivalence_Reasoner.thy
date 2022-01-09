@@ -272,9 +272,9 @@ text \<open>
 method try_equivalence uses simplification declares equivalence inclusion compatibility = (
   \<comment> \<open>Turn all chained facts into goal premises and try to solve the resulting goal:\<close>
   -, use nothing in \<open>
-    \<comment> \<open>Get the equivalence relation that is used by the conclusion and perform relaxation using it:\<close>
+    \<comment> \<open>Get the equivalence relation of the conclusion and preprocess the goal based on it:\<close>
     match equivalence in current_equivalence: "equivp R" for R \<Rightarrow> \<open>
-      \<comment> \<open>Make sure the equivalence relation is used by the conclusion (if it is not, backtrack):\<close>
+      \<comment> \<open>Make sure the equivalence relation is the one of the conclusion (if it is not, backtrack):\<close>
       match conclusion in "R _ _"  (cut) \<Rightarrow> \<open>succeed\<close>,
       \<comment> \<open>If any premises exist, relax all premises that can be relaxed and drop all others:\<close>
       (
@@ -287,16 +287,21 @@ method try_equivalence uses simplification declares equivalence inclusion compat
             relax inclusions: relax_inclusions
           \<close>
         \<close>
+      )?,
+      \<comment> \<open>Turn equivalences into equalities of equivalence class constructions:\<close>
+      simp (no_asm_use) only: current_equivalence [THEN equivalence_is_equivalence_class_equality],
+      \<comment> \<open>If compatibility rules for~\<^term>\<open>R\<close> exist and are applicable to the goal, apply them:\<close>
+      (
+        match compatibility in current_compatibilities: "R _ _" (multi, cut) \<Rightarrow> \<open>
+          unfold
+            current_compatibilities
+              [simplified
+                current_equivalence [THEN equivalence_is_right_frozen_equivalence_class_equality]
+              ]
+        \<close>,
+        unfold frozen_equivalence_class_def
       )?
     \<close>,
-    \<comment> \<open>Turn equivalences into equalities, taking compatibility rules into account:\<close>
-    simp (no_asm_use) only:
-      equivalence
-        [THEN equivalence_is_equivalence_class_equality]
-      compatibility
-        [simplified equivalence [THEN equivalence_is_right_frozen_equivalence_class_equality]],
-    \<comment> \<open>Unfreeze all frozen equivalence class constructions:\<close>
-    (unfold frozen_equivalence_class_def)?,
     \<comment> \<open>Simplify the conclusion, using the premises and the given simplification rules:\<close>
     (simp (no_asm_simp) only: simplification)?
   \<close>
