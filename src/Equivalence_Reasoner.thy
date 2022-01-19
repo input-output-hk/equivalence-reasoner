@@ -222,40 +222,41 @@ method generate_relax_inclusions for R :: "'a \<Rightarrow> 'a \<Rightarrow> boo
 )
 
 text \<open>
-  We introduce a helper method \<^theory_text>\<open>relax\<close> that takes a set of inclusions and turns all goal premises
-  of the shape \<open>P\<^sub>1 \<Longrightarrow> \<cdots> \<Longrightarrow> P\<^sub>n \<Longrightarrow> S t\<^sub>1 t\<^sub>2\<close> for which \<^term>\<open>S \<le> R\<close> is among the given inclusions
-  into \<open>P\<^sub>1 \<Longrightarrow> \<cdots> \<Longrightarrow> P\<^sub>n \<Longrightarrow> R t\<^sub>1 t\<^sub>2\<close>, while dropping all other premises.
+  We introduce a helper method \<^theory_text>\<open>relax\<close> that takes a set of inclusions and a set of rewrite rules
+  and turns each rewrite rule of the shape \<open>P\<^sub>1 \<Longrightarrow> \<cdots> \<Longrightarrow> P\<^sub>n \<Longrightarrow> S t\<^sub>1 t\<^sub>2\<close> for which \<^term>\<open>S \<le> R\<close> is
+  among the given inclusions into \<open>P\<^sub>1 \<Longrightarrow> \<cdots> \<Longrightarrow> P\<^sub>n \<Longrightarrow> R t\<^sub>1 t\<^sub>2\<close>, ignoring all other facts from the
+  set of rewrite rules. It receives the inclusions as goal premises and delivers the output rewrite
+  rules as the premises of the resulting goal.
 
-  The \<^theory_text>\<open>relax\<close> method recursively invokes itself. It removes the input premises one by one from the
-  goal and collects the output premises in a fact argument \<^theory_text>\<open>accumulator\<close>. As with
+  The \<^theory_text>\<open>relax\<close> method recursively invokes itself. It removes the inclusions one by one from the goal
+  and collects the output rewrite rules in a fact argument \<^theory_text>\<open>accumulator\<close>. As with
   @{method generate_relax_inclusions}, users of \<^theory_text>\<open>relax\<close> should not specify the \<^theory_text>\<open>accumulator\<close>
   argument, so that the method starts with \<^theory_text>\<open>accumulator\<close> being the empty fact list.
 \<close>
 
-method relax uses inclusions accumulator = (
-  \<comment> \<open>Pick a premise and process it:\<close>
-  match premises in premise [thin]: _ (cut) \<Rightarrow> \<open>
-    \<comment> \<open>Move all remaining premises back into the goal (see \#24 for the reason of that):\<close>
+method relax uses rewrite_rules accumulator = (
+  \<comment> \<open>Pick an inclusion and use it to process the rewrite rules that fit it:\<close>
+  match premises in inclusion [thin]: "S \<le> _" (cut) for S :: "'a \<Rightarrow> 'a \<Rightarrow> bool" \<Rightarrow> \<open>
+    \<comment> \<open>Move all remaining premises back into the goal\<^footnote>\<open>see \<^url>\<open>https://github.com/input-output-hk/equivalence-reasoner/issues/24\<close> for the reason of that\<close>:\<close>
     (match premises in remaining [thin]: _ (multi, cut) \<Rightarrow> \<open>insert remaining\<close>)?,
-    \<comment> \<open>Get the inclusion that fits the premise and process the premise using it:\<close>
-    match inclusions in inclusion: "S \<le> _" for S :: "'a \<Rightarrow> 'a \<Rightarrow> bool" \<Rightarrow> \<open>
-      \<comment> \<open>Make sure the inclusion fits the premise (if it does not, backtrack):\<close>
-      match premise [uncurry] in
-        "S _ _" (cut) \<Rightarrow> \<open>succeed\<close> \<bar>
-        "_ \<Longrightarrow> S _ _" (cut) \<Rightarrow> \<open>succeed\<close>,
-      \<comment> \<open>Continue with the relaxed premise added to the set of output premises:\<close>
-      match ("()") in "()" \<Rightarrow> \<open>
+    \<comment> \<open>Get the rewrite rules that fit the inclusion and process them:\<close>
+    match rewrite_rules [THEN TrueE [rotated], uncurry] in
+      current_rewrite_rules_mangled: "_ \<Longrightarrow> S _ _" (multi, cut) \<Rightarrow> \<open>
+        \<comment> \<open>Continue with the relaxed rewrite rules added to the set of output rewrite rules:\<close>
         relax
-          inclusions: inclusions
-          accumulator: accumulator premise [THEN inclusion [THEN predicate2D]]
-      \<close>
-    \<close> |
-    \<comment> \<open>Continue with the set of output premises unchanged:\<close>
+          rewrite_rules:
+            rewrite_rules
+          accumulator:
+            accumulator
+            current_rewrite_rules_mangled
+              [curry, rotated -1, OF TrueI, THEN inclusion [THEN predicate2D]]
+      \<close> |
+    \<comment> \<open>Continue with the set of output rewrite rules unchanged:\<close>
     relax
-      inclusions: inclusions
+      rewrite_rules: rewrite_rules
       accumulator: accumulator
   \<close> |
-  \<comment> \<open>Return the set of output premises:\<close>
+  \<comment> \<open>Return the set of output rewrite rules:\<close>
   insert accumulator
 )
 
@@ -279,13 +280,10 @@ method try_equivalence uses simplification declares equivalence inclusion compat
       \<comment> \<open>If any premises exist, relax all premises that can be relaxed and drop all others:\<close>
       (
         \<comment> \<open>Relax all premises that can be relaxed and drop all others:\<close>
-        match premises in original_premises [thin]: _ (multi, cut) \<Rightarrow> \<open>
+        match premises in rewrite_rules [thin]: _ (multi, cut) \<Rightarrow> \<open>
           insert inclusion,
           generate_relax_inclusions R,
-          match premises in relax_inclusions [thin]: _ (multi, cut) \<Rightarrow> \<open>
-            insert original_premises,
-            relax inclusions: relax_inclusions
-          \<close>
+          relax rewrite_rules: rewrite_rules
         \<close>
       )?,
       \<comment> \<open>Turn equivalences into equalities of equivalence class constructions:\<close>
