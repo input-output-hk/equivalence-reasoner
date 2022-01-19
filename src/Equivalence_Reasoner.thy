@@ -35,7 +35,8 @@ text \<open>
   reasoner will almost certainly fail, even when using a different configuration. For details about
   the transformations the equivalence reasoner performs see Section~\ref{implementation}.
 
-  Both equivalence reasoner methods share the same interface, which has the following appearance:
+  Both equivalence reasoner methods operate solely on the first subgoal. They share the same
+  interface, which has the following appearance:
 
     \<^item> The equivalence to be proved is given as the goal conclusion. It must have the form \<open>R _ _\<close>
       where \<^term>\<open>R\<close> is known to the equivalence reasoner as an equivalence relation. If it does not
@@ -271,37 +272,40 @@ text \<open>
 \<close>
 
 method try_equivalence uses simplification declares equivalence inclusion compatibility = (
-  \<comment> \<open>Turn all chained facts into goal premises and try to solve the resulting goal:\<close>
-  -, use nothing in \<open>
-    \<comment> \<open>Get the equivalence relation of the conclusion and preprocess the goal based on it:\<close>
-    match equivalence in current_equivalence: "equivp R" for R \<Rightarrow> \<open>
-      \<comment> \<open>Make sure the equivalence relation is the one of the conclusion (if it is not, backtrack):\<close>
-      match conclusion in "R _ _"  (cut) \<Rightarrow> \<open>succeed\<close>,
-      \<comment> \<open>If any premises exist, relax all premises that can be relaxed and drop all others:\<close>
-      (
-        \<comment> \<open>Relax all premises that can be relaxed and drop all others:\<close>
-        match premises in rewrite_rules [thin]: _ (multi, cut) \<Rightarrow> \<open>
-          insert inclusion,
-          generate_relax_inclusions R,
-          relax rewrite_rules: rewrite_rules
-        \<close>
-      )?,
-      \<comment> \<open>Turn equivalences into equalities of equivalence class constructions:\<close>
-      simp (no_asm_use) only: current_equivalence [THEN equivalence_is_equivalence_class_equality],
-      \<comment> \<open>If compatibility rules for~\<^term>\<open>R\<close> exist and are applicable to the goal, apply them:\<close>
-      (
-        match compatibility in current_compatibilities: "R _ _" (multi, cut) \<Rightarrow> \<open>
-          unfold
-            current_compatibilities
-              [simplified
-                current_equivalence [THEN equivalence_is_right_frozen_equivalence_class_equality]
-              ]
-        \<close>,
-        unfold frozen_equivalence_class_def
-      )?
-    \<close>,
-    \<comment> \<open>Simplify the conclusion, using the premises and the given simplification rules:\<close>
-    (simp (no_asm_simp) only: simplification)?
+  \<comment> \<open>Try to solve the first subgoal:\<close>
+  match conclusion in _ \<Rightarrow> \<open>
+    \<comment> \<open>Turn all chained facts into goal premises and try to solve the resulting goal:\<close>
+    -, use nothing in \<open>
+      \<comment> \<open>Get the equivalence relation of the conclusion and preprocess the goal based on it:\<close>
+      match equivalence in current_equivalence: "equivp R" for R \<Rightarrow> \<open>
+        \<comment> \<open>Make sure the equivalence relation is the one of the conclusion (if it is not, backtrack):\<close>
+        match conclusion in "R _ _"  (cut) \<Rightarrow> \<open>succeed\<close>,
+        \<comment> \<open>If any premises exist, relax all premises that can be relaxed and drop all others:\<close>
+        (
+          \<comment> \<open>Relax all premises that can be relaxed and drop all others:\<close>
+          match premises in rewrite_rules [thin]: _ (multi, cut) \<Rightarrow> \<open>
+            insert inclusion,
+            generate_relax_inclusions R,
+            relax rewrite_rules: rewrite_rules
+          \<close>
+        )?,
+        \<comment> \<open>Turn equivalences into equalities of equivalence class constructions:\<close>
+        simp (no_asm_use) only: current_equivalence [THEN equivalence_is_equivalence_class_equality],
+        \<comment> \<open>If compatibility rules for~\<^term>\<open>R\<close> exist and are applicable to the goal, apply them:\<close>
+        (
+          match compatibility in current_compatibilities: "R _ _" (multi, cut) \<Rightarrow> \<open>
+            unfold
+              current_compatibilities
+                [simplified
+                  current_equivalence [THEN equivalence_is_right_frozen_equivalence_class_equality]
+                ]
+          \<close>,
+          unfold frozen_equivalence_class_def
+        )?
+      \<close>,
+      \<comment> \<open>Simplify the conclusion, using the premises and the given simplification rules:\<close>
+      (simp (no_asm_simp) only: simplification)?
+    \<close>
   \<close>
 )
 
