@@ -109,6 +109,8 @@ imports
     \<comment>\<open>Besides Eisbach, we use the @{attribute uncurry} attribute from the Eisbach tools.\<close>
 begin
 
+context begin
+
 text \<open>
   We start with defining what an equivalence class, a representative, and a canonical form are.
 \<close>
@@ -168,10 +170,10 @@ text \<open>
   From there, no further translations are possible.
 \<close>
 
-definition frozen_equivalence_class :: "'a \<Rightarrow> ('a \<Rightarrow> 'a \<Rightarrow> bool) \<Rightarrow> 'a set" where
+private definition frozen_equivalence_class :: "'a \<Rightarrow> ('a \<Rightarrow> 'a \<Rightarrow> bool) \<Rightarrow> 'a set" where
   "frozen_equivalence_class = equivalence_class"
 
-lemma equivalence_is_right_frozen_equivalence_class_equality:
+private lemma equivalence_is_right_frozen_equivalence_class_equality:
   assumes "equivp R"
   shows "R x y \<longleftrightarrow> [x]\<^bsub>R\<^esub> = frozen_equivalence_class y R"
   unfolding frozen_equivalence_class_def
@@ -203,7 +205,7 @@ text \<open>
   argument, so that the method starts with \<^theory_text>\<open>accumulator\<close> being the empty fact list.
 \<close>
 
-method generate_relax_inclusions for R :: "'a \<Rightarrow> 'a \<Rightarrow> bool" uses accumulator = (
+private method generate_relax_inclusions for R :: "'a \<Rightarrow> 'a \<Rightarrow> bool" uses accumulator = (
   \<comment> \<open>Pick an input inclusion of the form \<open>_ \<le> R\<close>, called a base inclusion, and process it:\<close>
   match premises in base [thin]: "S \<le> R" (cut) for S \<Rightarrow> \<open>
     \<comment> \<open>If the base inclusion is extendable, add its extensions to the set of input inclusions:\<close>
@@ -235,7 +237,7 @@ text \<open>
   argument, so that the method starts with \<^theory_text>\<open>accumulator\<close> being the empty fact list.
 \<close>
 
-method relax uses rewrite_rules accumulator = (
+private method relax uses rewrite_rules accumulator = (
   \<comment> \<open>Pick an inclusion and use it to process the rewrite rules that fit it:\<close>
   match premises in inclusion [thin]: "S \<le> _" (cut) for S :: "'a \<Rightarrow> 'a \<Rightarrow> bool" \<Rightarrow> \<open>
     \<comment> \<open>Move all remaining premises back into the goal\<^footnote>\<open>see \<^url>\<open>https://github.com/input-output-hk/equivalence-reasoner/issues/24\<close> for the reason of that\<close>:\<close>
@@ -334,5 +336,7 @@ method equivalence uses equivalence inclusion compatibility simplification = (
 text \<open>
   This concludes the implementation of the equivalence reasoner.
 \<close>
+
+end
 
 end
