@@ -35,8 +35,17 @@ text \<open>
   reasoner will almost certainly fail, even when using a different configuration. For details about
   the transformations the equivalence reasoner performs see Section~\ref{implementation}.
 
-  Both equivalence reasoner methods operate solely on the first subgoal. They share the same
-  interface, which has the following appearance:
+  Apart from their different names, both equivalence reasoner methods share the same interface. The
+  syntax of invocations of these two methods and of underlying constructs is as follows:
+  \<^rail>\<open>
+    invocation:
+      (@@{theory_text equivalence} | @@{theory_text try_equivalence}) (argument*);
+    argument:
+      (named_theorem | @@{theory_text simplification}) @@{theory_text \<open>:\<close>} thms;
+    named_theorem:
+      @@{theory_text equivalence} | @@{theory_text inclusion} | @@{theory_text compatibility}
+  \<close>
+  Both methods operate solely on the first subgoal and receive their input in the following way:
 
     \<^item> The equivalence to be proved is given as the goal conclusion. It must have the form \<open>R _ _\<close>
       where \<^term>\<open>R\<close> is known to the equivalence reasoner as an equivalence relation. If it does not
@@ -45,8 +54,8 @@ text \<open>
     \<^item> Rewrite rules can be provided as premises, chained facts, or a mix of both. All premises and
       chained facts that are not valid rewrite rules are ignored.
 
-    \<^item> There is a named theorem \<^theory_text>\<open>equivalence\<close> that contains the fact \<^term>\<open>equivp R\<close> for
-      every~\<^term>\<open>R\<close> that the equivalence reasoner shall recognize as an equivalence relation.
+    \<^item> The named theorem \<^theory_text>\<open>equivalence\<close> contains the fact \<^term>\<open>equivp R\<close> for every~\<^term>\<open>R\<close> that the
+      equivalence reasoner shall recognize as an equivalence relation.
 
       Like with every named theorem, facts can be added to \<^theory_text>\<open>equivalence\<close> by applying an attribute
       named \<^theory_text>\<open>equivalence\<close> to them. Furthermore, additional facts can be provided for a particular
@@ -55,18 +64,18 @@ text \<open>
       All facts that are not of the form \<open>equivp _\<close> are ignored, whether they have been added to the
       named theorem using the \<^theory_text>\<open>equivalence\<close> attribute or passed as method arguments.
 
-    \<^item> There is a named theorem \<^theory_text>\<open>inclusion\<close> that contains facts of the shape \<open>T \<le> U\<close> where
-      \<^term>\<open>T\<close>~and~\<^term>\<open>U\<close> are relations. A rewrite rule that uses a relation~\<^term>\<open>S\<close> is considered
-      valid for rewriting an equivalence that uses an equivalence relation~\<^term>\<open>R\<close> exactly if the
-      statement \<open>S \<le> R\<close> can be derived from the given inclusions using only reflexivity and
-      transitivity of \<open>(\<le>)\<close> for relations.
+    \<^item> The named theorem \<^theory_text>\<open>inclusion\<close> contains facts of the shape \<open>T \<le> U\<close> where \<^term>\<open>T\<close>~and~\<^term>\<open>U\<close>
+      are relations. A rewrite rule that uses a relation~\<^term>\<open>S\<close> is considered valid for rewriting
+      in an equivalence that uses an equivalence relation~\<^term>\<open>R\<close> exactly if the statement \<open>S \<le> R\<close>
+      can be derived from the given inclusions using only reflexivity and transitivity of \<open>(\<le>)\<close> for
+      relations.
 
-      Like with \<^theory_text>\<open>equivalence\<close>, \<^theory_text>\<open>inclusion\<close> can be augmented via method arguments, and all facts
-      that are not of the appropriate form are ignored.
+      Analogously to \<^theory_text>\<open>equivalence\<close>, \<^theory_text>\<open>inclusion\<close> can be extended by attribute application and
+      augmented via method arguments, and all facts that are not of the appropriate form are ignored.
 
-    \<^item> There is a named theorem \<^theory_text>\<open>compatibility\<close> that contains facts that establish compatibility of
-      certain functions with certain equivalence relations. We call these facts compatibility rules.
-      The compatibility of an \<^term>\<open>n\<close>-ary function~\<^term>\<open>f\<close> with an equivalence relation~\<^term>\<open>R\<close> is
+    \<^item> The named theorem \<^theory_text>\<open>compatibility\<close> contains facts that establish compatibility of certain
+      functions with certain equivalence relations. We call these facts compatibility rules. The
+      compatibility of an \<^term>\<open>n\<close>-ary function~\<^term>\<open>f\<close> with an equivalence relation~\<^term>\<open>R\<close> is
       usually expressed using the statement
       \<open>\<And>x\<^sub>1 \<dots> x\<^sub>n y\<^sub>1 \<dots> y\<^sub>n. R x\<^sub>1 y\<^sub>1 \<Longrightarrow> \<cdots> \<Longrightarrow> R x\<^sub>n y\<^sub>n \<Longrightarrow> R (f x\<^sub>1 \<dots> x\<^sub>n) (f y\<^sub>1 \<dots> y\<^sub>n)\<close>. However, the
       equivalence reasoner expects this compatibility to be stated as
@@ -88,9 +97,9 @@ text \<open>
       compatibilities. To see exactly how the equivalence handler uses compatibility rules, turn
       to Section~\ref{implementation}.
 
-      Like with \<^theory_text>\<open>equivalence\<close> and \<^theory_text>\<open>inclusion\<close>, \<^theory_text>\<open>compatibility\<close> can be augmented via method
-      arguments. All facts that are not of the form \<open>R _ _\<close> where \<^term>\<open>R\<close> is the equivalence
-      relation of the conclusion are ignored.
+      Analogously to \<^theory_text>\<open>equivalence\<close> and \<^theory_text>\<open>inclusion\<close>, \<^theory_text>\<open>compatibility\<close> can be extended by attribute
+      application and augmented via method arguments. All facts that are not of the form \<open>R _ _\<close>
+      where \<^term>\<open>R\<close> is the equivalence relation of the conclusion are ignored.
 
     \<^item> Simplification rules for solving conditions arising from the application of conditional
       rewrite rules can be provided by adding them to the method invocation preceded by
