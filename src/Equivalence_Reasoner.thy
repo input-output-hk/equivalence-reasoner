@@ -249,7 +249,7 @@ text \<open>
 private method relax uses rewrite_rules accumulator = (
   \<comment> \<open>Pick an inclusion and use it to process the rewrite rules that fit it:\<close>
   match premises in inclusion [thin]: "S \<le> _" (cut) for S :: "'a \<Rightarrow> 'a \<Rightarrow> bool" \<Rightarrow> \<open>
-    \<comment> \<open>Move all remaining premises back into the goal\<^footnote>\<open>see \<^url>\<open>https://github.com/input-output-hk/equivalence-reasoner/issues/24\<close> for the reason of that\<close>:\<close>
+    \<comment> \<open>Move all remaining premises back into the goal\<^footnote>\<open>See \<^url>\<open>https://github.com/input-output-hk/equivalence-reasoner/issues/24\<close> for the reason of that.\<close>:\<close>
     (match premises in remaining [thin]: _ (multi, cut) \<Rightarrow> \<open>insert remaining\<close>)?,
     \<comment> \<open>Get the rewrite rules that fit the inclusion and process them:\<close>
     match rewrite_rules [THEN TrueE [rotated], uncurry] in
