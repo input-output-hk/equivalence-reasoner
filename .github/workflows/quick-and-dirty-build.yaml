@@ -1,10 +1,11 @@
 name: Automated quick-and-dirty build
 
 env:
-  isabelle-version: 2021
+  source-path: src
+  isabelle-version: 2021-1
+  other-isabelle-repos:
   chapter-name: IOG
   session-name: Equivalence_Reasoner
-  source-path: src
 
 on: [push]
 
@@ -24,6 +25,17 @@ jobs:
             wget --no-verbose --output-document=- https://mirror.clarkson.edu/isabelle/dist/Isabelle${{ env.isabelle-version }}_linux.tar.gz |
             tar --directory=/opt --extract --gzip
           fi
+      - name: Install other Isabelle sessions
+        run: |
+          mkdir --parent $HOME/.isabelle/Isabelle${{ env.isabelle-version }}
+          for repo in ${{ env.other-isabelle-repos }}
+          do
+            account=`echo $repo | cut --delimiter=/ --fields=1`
+            mkdir --parents /opt/other-isabelle-repos/$account
+            wget --no-verbose --output-document=/opt/other-isabelle-repos/$repo.zip https://github.com/$repo/archive/refs/heads/master.zip
+            unzip -d /opt/other-isabelle-repos/$account /opt/other-isabelle-repos/$repo.zip
+            echo /opt/other-isabelle-repos/$repo-master/${{ env.source-path }} >> $HOME/.isabelle/Isabelle${{ env.isabelle-version }}/ROOTS
+          done
       - name: Check out repository
         uses: actions/checkout@v2
       - name: Build
