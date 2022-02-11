@@ -1,5 +1,5 @@
-Start – version 0.0.0.0
-=======================
+Version 0.0.0.0 – version 0.1.0.0
+=================================
 
   * Write the introduction to the next-generation equivalence reasoner
 
