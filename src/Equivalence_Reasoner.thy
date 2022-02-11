@@ -1,3 +1,24 @@
+section \<open>Introduction\<close>
+
+text \<open>
+  Isabelle's Simplifier is a powerful tool for reasoning using term rewriting, with rewrite rules
+  given as equations. While this is more than sufficient in many cases, there are situations where
+  it would be great if automated rewriting could be done using mere equivalences as rewrite rules.
+  The automated equivalence reasoner described herein makes this possible.
+
+  Of course, rewriting based on equivalences is generally not sound. However, there are situations
+  where it is indeed valid. For example, if the goal is \<^term>\<open>R x y\<close> where \<^term>\<open>R\<close> is known to be an
+  equivalence relation, it is okay to use a fact \<^term>\<open>R x x'\<close> as a rewrite rule to turn that goal
+  into \<^term>\<open>R x' y\<close>. A more complex example would be that of a goal \<^term>\<open>R (f x) y\<close> where \<^term>\<open>R\<close>
+  is a congruence with respect to~\<^term>\<open>f\<close>. This goal can be safely turned into \<^term>\<open>R (f x') y\<close>.
+
+  The facilities of the equivalence reasoner go even beyond these kinds of rewriting, making it a
+  versatile tool for automated reasoning with equivalences. In particular, it is able to
+  automatically turn a given rewrite rule \<^term>\<open>S x x'\<close> into a rewrite rule \<^term>\<open>R x x'\<close> if \<^term>\<open>S\<close>
+  is known to be included in~\<^term>\<open>R\<close>, thus making the former rule usable for goals that involve
+  \<^term>\<open>R\<close> instead of~\<^term>\<open>S\<close>.
+\<close>
+
 section \<open>Usage\<close>
 
 text \<open>
