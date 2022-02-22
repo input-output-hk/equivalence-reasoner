@@ -22,7 +22,7 @@ jobs:
       - name: Get Isabelle from upstream if not found in cache
         run: |
           if [ ! -e /opt/Isabelle${{ env.isabelle-version }} ]; then
-            wget --no-verbose --output-document=- https://mirror.clarkson.edu/isabelle/dist/Isabelle${{ env.isabelle-version }}_linux.tar.gz |
+            curl --fail --silent --show-error https://mirror.clarkson.edu/isabelle/dist/Isabelle${{ env.isabelle-version }}_linux.tar.gz |
             tar --directory=/opt --extract --gzip
           fi
       - name: Install other Isabelle sessions
