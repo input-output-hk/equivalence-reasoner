@@ -32,7 +32,7 @@ jobs:
           do
             account=`echo $repo | cut --delimiter=/ --fields=1`
             mkdir --parents /opt/other-isabelle-repos/$account
-            curl --fail --silent --show-error https://github.com/$repo/archive/refs/heads/master.zip > /opt/other-isabelle-repos/$repo.zip
+            curl --fail --silent --show-error https://codeload.github.com/$repo/zip/refs/heads/master > /opt/other-isabelle-repos/$repo.zip
             unzip -d /opt/other-isabelle-repos/$account /opt/other-isabelle-repos/$repo.zip
             echo /opt/other-isabelle-repos/$repo-master/${{ env.source-path }} >> $HOME/.isabelle/Isabelle${{ env.isabelle-version }}/ROOTS
           done
