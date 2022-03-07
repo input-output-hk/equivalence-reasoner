@@ -30,7 +30,7 @@ When committing to this repository, please follow these rules:
         Merge `⟨other-branch⟩` into `⟨your-branch⟩`
 
   * When merging the branch of a pull request into the `master` branch,
-    put the subject line of the pull request into the body of the commit
+    put the title of the pull request into the body of the commit
     message and use a subject line of the following form:
 
         Merge `⟨branch⟩` of pull request #⟨pull-request-number⟩ into `master`
