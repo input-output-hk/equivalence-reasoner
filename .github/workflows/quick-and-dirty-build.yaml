@@ -21,25 +21,38 @@ jobs:
           path: /opt/Isabelle${{ env.isabelle-version }}
       - name: Get Isabelle from upstream if not found in cache
         run: |
-          if [ ! -e /opt/Isabelle${{ env.isabelle-version }} ]; then
-            curl --fail --silent --show-error https://mirror.clarkson.edu/isabelle/dist/Isabelle${{ env.isabelle-version }}_linux.tar.gz |
+          if [ ! -e '/opt/Isabelle${{ env.isabelle-version }}' ]
+          then
+            curl --fail --silent --show-error \
+              'https://mirror.clarkson.edu/isabelle/dist/Isabelle${{ env.isabelle-version }}_linux.tar.gz' |
             tar --directory=/opt --extract --gzip
           fi
       - name: Install other Isabelle sessions
         run: |
-          mkdir --parent $HOME/.isabelle/Isabelle${{ env.isabelle-version }}
+          mkdir -p "$HOME/.isabelle/Isabelle${{ env.isabelle-version }}"
           for repo in ${{ env.other-isabelle-repos }}
           do
-            account=`echo $repo | cut --delimiter=/ --fields=1`
-            mkdir --parents /opt/other-isabelle-repos/$account
-            curl --fail --silent --show-error https://codeload.github.com/$repo/zip/refs/heads/master > /opt/other-isabelle-repos/$repo.zip
-            unzip -d /opt/other-isabelle-repos/$account /opt/other-isabelle-repos/$repo.zip
-            echo /opt/other-isabelle-repos/$repo-master/${{ env.source-path }} >> $HOME/.isabelle/Isabelle${{ env.isabelle-version }}/ROOTS
+            account=$(echo "$repo" | cut -d / -f 1)
+            mkdir -p "/opt/other-isabelle-repos/$account"
+            curl --fail --silent --show-error \
+              "https://codeload.github.com/$repo/zip/refs/heads/master" \
+              > "/opt/other-isabelle-repos/$repo.zip"
+            unzip -d "/opt/other-isabelle-repos/$account" \
+              "/opt/other-isabelle-repos/$repo.zip"
+            echo \
+              "/opt/other-isabelle-repos/$repo-master/${{ env.source-path }}" \
+              >> "$HOME/.isabelle/Isabelle${{ env.isabelle-version }}/ROOTS"
           done
       - name: Check out repository
         uses: actions/checkout@v2
       - name: Build
-        run: /opt/Isabelle${{ env.isabelle-version }}/bin/isabelle build -o quick_and_dirty -o document=pdf -P output -D ${{ env.source-path }}
+        run: |
+          '/opt/Isabelle${{ env.isabelle-version }}/bin/isabelle' \
+            build \
+            -o quick_and_dirty \
+            -o document=pdf \
+            -P output \
+            -D '${{ env.source-path }}'
       - name: Upload document
         uses: actions/upload-artifact@v2
         with:
