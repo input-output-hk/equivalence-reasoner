@@ -2,7 +2,7 @@ name: Automated quick-and-dirty build
 
 env:
   source-path: src
-  isabelle-version: 2021-1
+  isabelle-version: 2022
   other-isabelle-repos:
   chapter-name: IOG
   session-name: Equivalence_Reasoner
