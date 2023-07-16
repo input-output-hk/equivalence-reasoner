@@ -1,7 +1,17 @@
-Commit rules
-============
+Rules for branches
+==================
 
-When committing to this repository, please follow these rules:
+  * Use a branch name of the form `⟨type⟩/⟨topic⟩`. Here, `⟨type⟩`
+    refers to the type of contribution as given by the label of the form
+    `type: ⟨type⟩` of the pull request associated with the branch.
+
+  * For the `⟨topic⟩` part of the branch name, use only lowercase Latin
+    letters, Arabic numerals, and ASCII dashes, with the latter also
+    serving as separators of words.
+
+
+Rules for commits[^original-commit-rules]
+=========================================
 
   * Put only related changes into a single commit.
 
@@ -38,5 +48,6 @@ When committing to this repository, please follow these rules:
     Here, `⟨branch⟩` refers to the name of the branch without the GitHub
     account name component.
 
-Several of these rules have been taken from
-https://chris.beams.io/posts/git-commit/#seven-rules.
+[^original-commit-rules]:
+    Several of these rules have been taken from
+    https://chris.beams.io/posts/git-commit/#seven-rules.
