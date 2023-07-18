@@ -133,10 +133,10 @@ section \<open>Implementation\<close>
 text_raw \<open>\label{implementation}\<close>
 
 theory Equivalence_Reasoner
-imports
-  Main
-  "HOL-Eisbach.Eisbach_Tools"
-    \<comment>\<open>Besides Eisbach, we use the @{attribute uncurry} attribute from the Eisbach tools.\<close>
+  imports
+    Main
+    "HOL-Eisbach.Eisbach_Tools"
+      \<comment>\<open>Besides Eisbach, we use the @{attribute uncurry} attribute from the Eisbach tools.\<close>
 begin
 
 context begin
